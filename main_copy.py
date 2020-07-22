@@ -6,7 +6,7 @@ from datetime import datetime   #午後8時に今日の感染者数を見る為�
 import requests #httpリクエストを送るための標準ライブラリ
 from bs4 import BeautifulSoup   #requestsの内容をスクレイピングする為のライブラリ
 
-#クライアントを定義
+#オブジェくトの生成
 client = discord.Client()
 
 #getでURLに接続しデータを取得(都内感染者数)
