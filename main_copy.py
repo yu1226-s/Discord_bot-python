@@ -6,27 +6,8 @@ from datetime import datetime   #午後8時に今日の感染者数を見る為�
 import requests #httpリクエストを送るための標準ライブラリ
 from bs4 import BeautifulSoup   #requestsの内容をスクレイピングする為のライブラリ
 
-#オブジェくトの生成
+#オブジェクトを格納
 client = discord.Client()
-
-#getでURLに接続しデータを取得(都内感染者数)
-res= requests.get("https://stopcovid19.metro.tokyo.lg.jp/cards/number-of-confirmed-cases/")
-
-#先のサイトをlxmlというパーサで解析
-soup = BeautifulSoup(res.text,"lxml")
-
-#今日の感染者数はspanタグで囲まれてクラス名は以下の様になっているそれをget_text()でさらに成形
-today = soup.find("span",class_="DataView-DataInfo-summary").get_text(strip=True)
-#今日の感染者数はsmallタグで囲まれてクラス名は以下の様になっているそれをget_text()でさらに成形
-compared_to = soup.find("small",class_="DataView-DataInfo-date").get_text(strip=True)
-
-#getでURLに接続しデータを取得(ヤフーニュース)
-res2= requests.get("https://news.yahoo.co.jp/")
-
-#先のサイトをlxmlというパーサで解析
-yahoo = BeautifulSoup(res2.text,"lxml")
-#class名topicsをtopicsindexに格納
-topicsindex = yahoo.find(class_="topics")
 
 #ここから先はdiscord.pyの処理
 #60秒に一回のループ
@@ -58,10 +39,29 @@ async def on_message(message):
         return
     #感染者数教えてと送られた際に埋め込みメッセージを返す
     if message.content.startswith('感染者数教えて'):
+        #getでURLに接続しデータを取得(都内感染者数)
+        res= requests.get("https://stopcovid19.metro.tokyo.lg.jp/cards/number-of-confirmed-cases/")
+
+        #先のサイトをlxmlというパーサで解析
+        soup = BeautifulSoup(res.text,"lxml")
+
+        #今日の感染者数はspanタグで囲まれてクラス名は以下の様になっているそれをget_text()でさらに成形
+        today = soup.find("span",class_="DataView-DataInfo-summary").get_text(strip=True)
+        #今日の感染者数はsmallタグで囲まれてクラス名は以下の様になっているそれをget_text()でさらに成形
+        compared_to = soup.find("small",class_="DataView-DataInfo-date").get_text(strip=True)
+
         embed = discord.Embed(title="都内感染者数:",description=today)
         await message.channel.send(embed=embed)
    #ニュースを教えてと送られた際に埋め込みメッセージを返す
     if message.content.startswith('ニュース教えて'):
+        #getでURLに接続しデータを取得(ヤフーニュース)
+        res2= requests.get("https://news.yahoo.co.jp/")
+
+        #先のサイトをlxmlというパーサで解析
+        yahoo = BeautifulSoup(res2.text,"lxml")
+        #class名topicsをtopicsindexに格納
+        topicsindex = yahoo.find(class_="topics")
+
         #ヤフーのトップニュースが7つあるので7つのニュースについてスクレイピングを行う
         for i in range(1,8):
             #カスタム属性data-ylkのニュースタイトルをget_text()さらに成形
